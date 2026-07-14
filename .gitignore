@@ -1,0 +1,55 @@
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### Java / Maven / Spring Boot (backend/) ###
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+!backend/**/src/main/**/target/
+!backend/**/src/test/**/target/
+HELP.md
+
+### Node / Vite / React (frontend/) ###
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+### Python / ETL (etl-python/) ###
+etl-python/__pycache__/
+etl-python/*.pyc
+etl-python/.venv/
+etl-python/venv/
+
+### Environment / secrets — never commit these ###
+.env
+.env.local
+*.env
+
+### Data artifacts — mock data can stay, but generated DB files shouldn't be tracked long-term ###
+*.db
+*.sqlite
+
+### Logs ###
+logs
+*.log
+
+### OS files ###
+.DS_Store
+Thumbs.db
+
+### Editor directories ###
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
