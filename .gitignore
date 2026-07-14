@@ -53,3 +53,4 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+backend/src/test/java/finstream/server/ServerApplicationTests.java
