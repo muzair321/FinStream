@@ -8,8 +8,8 @@ out/
 ### Java / Maven / Spring Boot (backend/) ###
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
-!backend/**/src/main/**/target/
-!backend/**/src/test/**/target/
+!backend/server/src/main/**/target/
+!backend/server/src/test/**/target/
 HELP.md
 
 ### Node / Vite / React (frontend/) ###
