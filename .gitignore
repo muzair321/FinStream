@@ -54,3 +54,4 @@ Thumbs.db
 *.sln
 *.sw?
 /backend/server/.mvn/wrapper/maven-wrapper.properties
+/backend/server/src/test/java/finstream/server/ServerApplicationTests.java
