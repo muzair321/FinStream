@@ -1,0 +1,60 @@
+import pandas as pd
+import sqlite3
+import os
+
+print("🔄 Initializing FinStream ETL Pipeline Engine...")
+
+# Target paths inside your desktop workspace folder
+desktop_path = os.path.dirname(os.path.abspath(__file__))
+excel_file = os.path.join(desktop_path, 'departmental_opsex_2025.xlsx')
+access_csv_backup = os.path.join(desktop_path, 'access_internal_payroll.csv')
+output_db = os.path.join(desktop_path, 'finstream_analytics.db')
+
+# --- PHASE 1: EXTRACTION ---
+print("📥 Extracting data from corporate operational silos...")
+
+# Read the messy regional Excel tracker
+df_opsex = pd.read_excel(excel_file, sheet_name='Marketing_&_Ops_OpsEx')
+
+# Read the internal legacy ERP database data
+# (Using the clean CSV snapshot created for your Access database architecture)
+df_payroll = pd.read_csv(access_csv_backup)
+
+
+# --- PHASE 2: TRANSFORMATION (The Intelligence Layer) ---
+print("🧼 Transforming and normalizing financial figures...")
+
+# 1. Clean the Excel Data: Fix data gaps (NaN values) using a forward fill
+missing_before = df_opsex['actual_spent_usd'].isna().sum()
+df_opsex['actual_spent_usd'] = df_opsex['actual_spent_usd'].ffill()
+print(f"   ↳ Handled {missing_before} missing expense rows via rolling forward-fill.")
+
+# 2. Currency Standardization: Convert internal Access payroll (PKR) to USD
+# Using a static corporate benchmark exchange rate of 1 USD = 278 PKR
+exchange_rate_pkr_to_usd = 278
+df_payroll['monthly_salary_usd'] = (df_payroll['monthly_salary_pkr'] / exchange_rate_pkr_to_usd).round(2)
+print("   ↳ Standardized legacy internal payroll values from PKR to USD.")
+
+# 3. Aggregating operational data metrics to calculate Corporate Monthly Burn Rate
+total_monthly_payroll_usd = df_payroll['monthly_salary_usd'].sum()
+
+
+# --- PHASE 3: LOADING ---
+print("📤 Loading clean analytical layers into SQL Database...")
+
+# Open connection to an optimized local SQL warehouse engine (SQLite database file)
+conn = sqlite3.connect(output_db)
+
+# Push clean tables into the warehouse analytics schemas
+df_opsex.to_sql('analytics_departmental_opsex', conn, if_exists='replace', index=False)
+df_payroll.to_sql('analytics_internal_payroll', conn, if_exists='replace', index=False)
+
+# Create a consolidated metrics metadata table for the dashboards
+summary_metrics = pd.DataFrame([{
+    'metric_name': 'Total Monthly Payroll USD',
+    'metric_value': round(total_monthly_payroll_usd, 2)
+}])
+summary_metrics.to_sql('analytics_global_summary', conn, if_exists='replace', index=False)
+
+conn.close()
+print("🚀 ETL Pipeline Completed Successfully! Created 'finstream_analytics.db'")
