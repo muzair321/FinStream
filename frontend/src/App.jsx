@@ -1,122 +1,86 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+function TabContainer({ activeTab, setActiveTab }) {
+  const tabs = [
+    { id: 'home', label: 'Home' },
+    { id: 'revenue', label: 'Revenue & Billing' },
+    { id: 'expenses', label: 'Expenses' },
+    { id: 'payroll', label: 'Payroll' },
+    { id: 'forecast', label: 'Forecast' },
+    { id: 'uploads', label: 'Uploads' },
+    { id: 'about', label: 'About' },
+  ]
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <nav className="w-64 min-h-screen bg-slate-900 border-r border-slate-800 flex flex-col">
+      <div className="px-6 py-6 border-b border-slate-800">
+        <h1 className="text-xl font-mono font-semibold text-emerald-400 tracking-tight">
+          FinStream
+        </h1>
+      </div>
+      <ul className="flex-1 px-3 py-4 space-y-1">
+        {tabs.map((tab) => (
+          <li key={tab.id}>
+            <button
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-emerald-400/10 text-emerald-400 border-l-2 border-emerald-400'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              {tab.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }
 
-export default App
+// --- Placeholder pages: replace each with real content later ---
+function Home() {
+  return <div className="p-8 text-slate-300">Home page — dashboard KPIs go here.</div>
+}
+function Revenue() {
+  return <div className="p-8 text-slate-300">Revenue & Billing — Stripe invoice data goes here.</div>
+}
+function Expenses() {
+  return <div className="p-8 text-slate-300">Expenses — departmental opex tracker goes here.</div>
+}
+function Payroll() {
+  return <div className="p-8 text-slate-300">Payroll — internal payroll summary goes here.</div>
+}
+function Forecast() {
+  return <div className="p-8 text-slate-300">Forecast — burn rate & runway projections go here.</div>
+}
+function Uploads() {
+  return <div className="p-8 text-slate-300">Uploads — file upload & processing status goes here.</div>
+}
+function About() {
+  return <div className="p-8 text-slate-300">About — project description goes here.</div>
+}
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home')
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'home': return <Home />
+      case 'revenue': return <Revenue />
+      case 'expenses': return <Expenses />
+      case 'payroll': return <Payroll />
+      case 'forecast': return <Forecast />
+      case 'uploads': return <Uploads />
+      case 'about': return <About />
+      default: return <Home />
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen bg-slate-950">
+      <TabContainer activeTab={activeTab} setActiveTab={setActiveTab} />
+      <main className="flex-1">{renderTabContent()}</main>
+    </div>
+  )
+}
