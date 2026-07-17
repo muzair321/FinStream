@@ -16,7 +16,7 @@ const revenueTrend = [
   { month: 'Apr', revenue: 38200 },
   { month: 'May', revenue: 41000 },
   { month: 'Jun', revenue: 43900 },
-  { month: 'Jul', revenue: 48320 },
+  { month: 'Jul', revenue: 485320 },
 ]
 
 const budgetByDept = [
@@ -29,12 +29,12 @@ const budgetByDept = [
 
 function KpiCard({ label, value, change, icon: Icon, positive }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 sm:p-5 flex flex-col gap-2">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
       <div className="flex items-center justify-between">
-        <span className="text-slate-400 text-sm font-medium">{label}</span>
+        <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">{label}</span>
         <Icon size={18} className="text-emerald-400" />
       </div>
-      <span className="text-2xl font-semibold text-slate-100 font-mono">{value}</span>
+      <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100 font-mono">{value}</span><br></br>
       <span className={`text-xs font-medium ${positive ? 'text-emerald-400' : 'text-red-400'}`}>
         {change}
       </span>
@@ -42,12 +42,17 @@ function KpiCard({ label, value, change, icon: Icon, positive }) {
   )
 }
 
-export default function Dashboard() {
+export default function Dashboard({ theme }) {
+  const isDark = theme === 'dark'
+  const gridColor = isDark ? '#1e293b' : '#e2e8f0'
+  const axisColor = isDark ? '#64748b' : '#475569'
+  const tooltipBg = isDark ? '#0f172a' : '#ffffff'
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-100">Dashboard</h2>
-        <p className="text-sm text-slate-400">Overview of key financial metrics</p>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Dashboard</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Overview of key financial metrics</p>
       </div>
 
       {/* KPI cards */}
@@ -60,16 +65,16 @@ export default function Dashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Revenue trend line chart */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 sm:p-5">
-          <h3 className="text-sm font-medium text-slate-300 mb-4">Revenue Trend</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Revenue Trend</h3>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={revenueTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-              <YAxis stroke="#64748b" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="month" stroke={axisColor} fontSize={12} />
+              <YAxis stroke={axisColor} fontSize={12} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }}
-                labelStyle={{ color: '#e2e8f0' }}
+                contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${gridColor}`, borderRadius: 8 }}
+                labelStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
               />
               <Line
                 type="monotone"
@@ -83,16 +88,16 @@ export default function Dashboard() {
         </div>
 
         {/* Budget vs actual bar chart */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 sm:p-5">
-          <h3 className="text-sm font-medium text-slate-300 mb-4">Budget vs Actual by Department</h3>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
+          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Budget vs Actual by Department</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={budgetByDept}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="department" stroke="#64748b" fontSize={11} />
-              <YAxis stroke="#64748b" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="department" stroke={axisColor} fontSize={11} />
+              <YAxis stroke={axisColor} fontSize={12} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8 }}
-                labelStyle={{ color: '#e2e8f0' }}
+                contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${gridColor}`, borderRadius: 8 }}
+                labelStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="allocated" fill="#475569" radius={[4, 4, 0, 0]} name="Allocated" />

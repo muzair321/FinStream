@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import Dashboard from './components/dashboard.jsx'
+import { useTheme, ThemeToggle } from './theme/ThemeToggle'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
@@ -29,7 +30,7 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
       )}
 
       <nav
-        className={`fixed md:static top-0 left-0 h-screen w-64 bg-slate-900 border-r border-slate-800
+        className={`bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 fixed md:static top-0 left-0 h-screen w-64 bg-slate-900 border-r border-slate-800
           flex flex-col z-40 transform transition-transform duration-200 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
@@ -92,9 +93,10 @@ function About() {
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [theme, setTheme] = useTheme()
 
   const tabLabels = {
-    home: 'Home',
+    home: 'Dashboard',
     revenue: 'Revenue & Billing',
     expenses: 'Expenses',
     payroll: 'Payroll',
@@ -105,7 +107,7 @@ export default function App() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'home': return <Dashboard />
+      case 'home': return <Dashboard theme={theme} />
       case 'revenue': return <Revenue />
       case 'expenses': return <Expenses />
       case 'payroll': return <Payroll />
@@ -117,7 +119,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
       <TabContainer
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -126,16 +128,20 @@ export default function App() {
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile top bar with hamburger — hidden on desktop since the sidebar is always visible there */}
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-slate-800 bg-slate-900">
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="text-slate-300 hover:text-emerald-400"
-            aria-label="Open menu"
-          >
-            <Menu size={22} />
-          </button>
-          <span className="text-slate-200 font-medium text-sm">{tabLabels[activeTab]}</span>
+        <header className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden text-slate-500 dark:text-slate-300 hover:text-emerald-500"
+              aria-label="Open menu"
+            >
+              <Menu size={22} />
+            </button>
+            <span className="text-slate-700 dark:text-slate-200 font-medium text-sm">
+              {tabLabels[activeTab]}
+            </span>
+          </div>
+          <ThemeToggle theme={theme} setTheme={setTheme} />
         </header>
 
         <main className="flex-1 overflow-x-hidden">{renderTabContent()}</main>
