@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import Dashboard from './components/dashboard.jsx'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
-    { id: 'home', label: 'Home' },
+    { id: 'home', label: 'Dashboard' },
     { id: 'revenue', label: 'Revenue & Billing' },
     { id: 'expenses', label: 'Expenses' },
     { id: 'payroll', label: 'Payroll' },
@@ -104,7 +105,7 @@ export default function App() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'home': return <Home />
+      case 'home': return <Dashboard />
       case 'revenue': return <Revenue />
       case 'expenses': return <Expenses />
       case 'payroll': return <Payroll />
