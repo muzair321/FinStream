@@ -15,6 +15,14 @@ const statusConfig = {
   failed: { icon: XCircle, color: 'text-red-400', label: 'Failed' },
 }
 
+function formatDate(isoString) {
+  const date = new Date(isoString)
+  return date.toLocaleString('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
+
 export default function Audit() {
   const [dragActive, setDragActive] = useState(false)
   const [sourceType, setSourceType] = useState('invoices')
@@ -161,7 +169,7 @@ export default function Audit() {
                       {f.filename}
                     </td>
                     <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400 capitalize">{f.sourceType}</td>
-                    <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400">{f.uploadedAt}</td>
+                    <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400">{formatDate(f.uploadedAt)}</td>
                     <td className="px-4 sm:px-5 py-3">
                       <Icon size={16} className={color} />
                     </td>
