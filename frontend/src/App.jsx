@@ -6,7 +6,7 @@ import Revenue from './components/revenue.jsx'
 import Expenses from './components/expenses.jsx'
 import Payroll from './components/payroll.jsx'
 import Forecast from './components/forecast.jsx'
-import Uploads from './components/files_uploaded.jsx'
+import Audit from './components/audit.jsx'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
@@ -15,7 +15,7 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
     { id: 'expenses', label: 'Expenses' },
     { id: 'payroll', label: 'Payroll' },
     { id: 'forecast', label: 'Forecast' },
-    { id: 'uploads', label: 'Uploads' },
+    { id: 'audit', label: 'Audited Files' },
     { id: 'about', label: 'About' },
   ]
 
@@ -92,7 +92,7 @@ export default function App() {
     expenses: 'Expenses',
     payroll: 'Payroll',
     forecast: 'Forecast',
-    uploads: 'Uploads',
+    uploads: 'Audited Files',
     about: 'About',
   }
 
@@ -103,7 +103,7 @@ export default function App() {
       case 'expenses': return <Expenses />
       case 'payroll': return <Payroll />
       case 'forecast': return <Forecast />
-      case 'uploads': return <Uploads />
+      case 'audit': return <Audit />
       case 'about': return <About />
       default: return <Home />
     }
