@@ -2,6 +2,11 @@ import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import Dashboard from './components/dashboard.jsx'
 import { useTheme, ThemeToggle } from './theme/ThemeToggle'
+import Revenue from './components/revenue.jsx'
+import Expenses from './components/expenses.jsx'
+import Payroll from './components/payroll.jsx'
+import Forecast from './components/forecast.jsx'
+import Uploads from './components/files_uploaded.jsx'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
@@ -71,21 +76,7 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
 function Home() {
   return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Home page — dashboard KPIs go here.</div>
 }
-function Revenue() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Revenue & Billing — Stripe invoice data goes here.</div>
-}
-function Expenses() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Expenses — departmental opex tracker goes here.</div>
-}
-function Payroll() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Payroll — internal payroll summary goes here.</div>
-}
-function Forecast() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Forecast — burn rate & runway projections go here.</div>
-}
-function Uploads() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Uploads — file upload & processing status goes here.</div>
-}
+
 function About() {
   return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">About — project description goes here.</div>
 }
