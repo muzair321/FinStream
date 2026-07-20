@@ -1,0 +1,76 @@
+
+//dashboard
+const kpis = [
+  { label: 'MRR', value: '$48,320', change: '+12.4%', icon: TrendingUp, positive: true },
+  { label: 'Burn Rate', value: '$31,900/mo', change: '+3.1%', icon: Flame, positive: false },
+  { label: 'Runway', value: '14.2 mo', change: '-0.8 mo', icon: Clock, positive: false },
+  { label: 'Budget Variance', value: '+6.7%', change: 'over budget', icon: Target, positive: false },
+]
+
+const revenueTrend = [
+  { month: 'Jan', revenue: 32000 },
+  { month: 'Feb', revenue: 34500 },
+  { month: 'Mar', revenue: 33800 },
+  { month: 'Apr', revenue: 38200 },
+  { month: 'May', revenue: 41000 },
+  { month: 'Jun', revenue: 43900 },
+  { month: 'Jul', revenue: 48320 },
+]
+
+const budgetByDept = [
+  { department: 'Engineering', allocated: 42000, actual: 45200 },
+  { department: 'Marketing', allocated: 18000, actual: 16400 },
+  { department: 'Sales', allocated: 15000, actual: 17800 },
+  { department: 'HR', allocated: 8000, actual: 7600 },
+  { department: 'Executive', allocated: 12000, actual: 13100 },
+]
+
+//revenue
+const mockInvoices = [
+  { invoice_id: 'INV-STRIPE-100234', customer_id: 'CUST-7821', amount_usd: 199, status: 'Paid', subscription_plan: 'Professional', created_at: '2026-07-01' },
+  { invoice_id: 'INV-STRIPE-100235', customer_id: 'CUST-6612', amount_usd: 999, status: 'Paid', subscription_plan: 'Enterprise', created_at: '2026-07-02' },
+  { invoice_id: 'INV-STRIPE-100236', customer_id: 'CUST-9034', amount_usd: 49, status: 'Failed', subscription_plan: 'Basic', created_at: '2026-07-03' },
+  { invoice_id: 'INV-STRIPE-100237', customer_id: 'CUST-5521', amount_usd: 199, status: 'Refunded', subscription_plan: 'Professional', created_at: '2026-07-04' },
+]
+
+const mrrByTier = [
+  { month: 'Apr', Basic: 4200, Professional: 12400, Enterprise: 18900 },
+  { month: 'May', Basic: 4500, Professional: 13100, Enterprise: 19600 },
+  { month: 'Jun', Basic: 4800, Professional: 14200, Enterprise: 21800 },
+  { month: 'Jul', Basic: 5100, Professional: 15600, Enterprise: 24000 },
+]
+
+//expenses
+const mockOpex = [
+  { expense_date: '2026-07-01', expense_category: 'AWS Cloud Hosting', allocated_budget_usd: 8000, actual_spent_usd: 9200 },
+  { expense_date: '2026-07-02', expense_category: 'Marketing Ads', allocated_budget_usd: 6000, actual_spent_usd: 5100 },
+  { expense_date: '2026-07-03', expense_category: 'Software Licenses', allocated_budget_usd: 3000, actual_spent_usd: 3400 },
+  { expense_date: '2026-07-04', expense_category: 'Office Rent', allocated_budget_usd: 12000, actual_spent_usd: 12000 },
+  { expense_date: '2026-07-05', expense_category: 'Travel Expenses', allocated_budget_usd: 2500, actual_spent_usd: 1800 },
+]
+
+const chartData = mockOpex.map(o => ({
+  category: o.expense_category,
+  Allocated: o.allocated_budget_usd,
+  Actual: o.actual_spent_usd,
+}))
+
+
+//payroll
+const deptCosts = [
+  { department: 'Engineering', totalCostUsd: 62400 },
+  { department: 'Marketing', totalCostUsd: 21800 },
+  { department: 'Sales', totalCostUsd: 24600 },
+  { department: 'HR', totalCostUsd: 11200 },
+  { department: 'Executive', totalCostUsd: 34500 },
+]
+
+//forecaast
+const forecastData = [
+  { month: 'May', actual: 41000, projected: null },
+  { month: 'Jun', actual: 43900, projected: null },
+  { month: 'Jul', actual: 48320, projected: 48320 },
+  { month: 'Aug', actual: null, projected: 51200 },
+  { month: 'Sep', actual: null, projected: 53800 },
+  { month: 'Oct', actual: null, projected: 56100 },
+]

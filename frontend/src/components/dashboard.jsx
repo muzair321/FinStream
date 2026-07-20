@@ -3,6 +3,9 @@ import axios from 'axios'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { TrendingUp, Flame, Clock, Target } from 'lucide-react'
 
+
+
+
 function KpiCard({ label, value, icon: Icon, change }) {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">

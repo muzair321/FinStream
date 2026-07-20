@@ -197,6 +197,65 @@ def save_snapshot(metrics: dict):
             {**metrics, "computed_at": datetime.now()},
         )
 
+import numpy as np
+
+def generate_forecast(df_invoices: pd.DataFrame, df_opex: pd.DataFrame, df_payroll: pd.DataFrame, months_ahead: int = 3):
+    """
+    Projects revenue and burn rate forward using simple linear regression
+    on historical monthly totals. Honest about being a trend projection,
+    not a full ARIMA/Prophet model — appropriate given limited history.
+    """
+    # --- Monthly revenue history (from Paid invoices) ---
+    paid = df_invoices[df_invoices["status"] == "Paid"].copy()
+    paid["month"] = paid["created_at"].dt.to_period("M")
+    monthly_revenue = paid.groupby("month")["amount_usd"].sum().sort_index()
+
+    if len(monthly_revenue) < 2:
+        print("   ↳ Not enough revenue history to forecast yet. Skipping.")
+        return
+
+    # --- Monthly burn history (opex actual spend, payroll assumed constant) ---
+    opex_copy = df_opex.copy()
+    opex_copy["expense_date"] = pd.to_datetime(opex_copy["expense_date"])
+    opex_copy["month"] = opex_copy["expense_date"].dt.to_period("M")
+    monthly_opex = opex_copy.groupby("month")["actual_spent_usd"].sum().sort_index()
+
+    total_payroll = df_payroll["monthly_salary_usd"].sum()
+
+    # --- Fit a simple linear trend: x = month index, y = revenue/opex ---
+    x = np.arange(len(monthly_revenue))
+    y_revenue = monthly_revenue.values
+    revenue_slope, revenue_intercept = np.polyfit(x, y_revenue, 1)
+
+    x_opex = np.arange(len(monthly_opex))
+    y_opex = monthly_opex.values
+    opex_slope, opex_intercept = np.polyfit(x_opex, y_opex, 1) if len(monthly_opex) >= 2 else (0, y_opex[-1])
+
+    # --- Project forward ---
+    last_month = monthly_revenue.index.max()
+    forecast_rows = []
+
+    for i in range(1, months_ahead + 1):
+        future_month = last_month + i
+        future_date = future_month.to_timestamp()
+
+        projected_revenue = revenue_slope * (len(monthly_revenue) - 1 + i) + revenue_intercept
+        projected_opex = opex_slope * (len(monthly_opex) - 1 + i) + opex_intercept
+        projected_burn = max(projected_opex, 0) + total_payroll
+
+        forecast_rows.append({
+            "forecast_date": future_date.date(),
+            "projected_revenue": round(max(projected_revenue, 0), 2),
+            "projected_burn": round(projected_burn, 2),
+        })
+
+    df_forecast = pd.DataFrame(forecast_rows)
+
+    with engine.begin() as conn:
+        conn.execute(text("TRUNCATE TABLE cashflow_forecast RESTART IDENTITY CASCADE;"))
+        df_forecast.to_sql("cashflow_forecast", conn, if_exists="append", index=False)
+
+    print(f"   ↳ Generated {len(df_forecast)}-month forecast: {forecast_rows}")
 
 # ---------------------------------------------------------------------------
 # 4. MAIN — run the whole pipeline end to end
@@ -243,6 +302,9 @@ def run_pipeline():
     # 4. Aggregate & Snapshot metrics
     metrics = compute_metrics(df_invoices, df_payroll, df_opex)
     save_snapshot(metrics)
+    print("📈 Generating forecast...")
+    generate_forecast(df_invoices, df_opex, df_payroll)
+
     print("🚀 ETL Pipeline Completed Successfully! Clean reporting layers generated.")
 
 

@@ -7,6 +7,9 @@ import Expenses from './components/expenses.jsx'
 import Payroll from './components/payroll.jsx'
 import Forecast from './components/forecast.jsx'
 import Audit from './components/audit.jsx'
+import About from './components/about.jsx'
+import { Download } from 'lucide-react'
+import axios from 'axios'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
@@ -22,6 +25,25 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const handleTabClick = (id) => {
     setActiveTab(id)
     setIsOpen(false) // auto-close drawer on mobile after picking a tab
+  }
+  const handleExport = async () => {
+    try {
+      const res = await axios.get('http://localhost:8080/api/export/excel', {
+        responseType: 'blob', // tells axios to expect binary data, not JSON
+      })
+
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'finstream_export.xlsx')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Export failed:', err)
+      alert('Export failed. Check the server is running.')
+    }
   }
 
   return (
@@ -56,29 +78,28 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
             <li key={tab.id}>
               <button
                 onClick={() => handleTabClick(tab.id)}
-                className={`w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === tab.id
+                className={`w-full text-left px-4 py-2.5 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
                     ? 'bg-emerald-400/10 text-emerald-400 border-l-2 border-emerald-400'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
             </li>
           ))}
         </ul>
+        <div className="px-3 py-4 border-t border-slate-800">
+          <button
+            onClick={handleExport}
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium text-slate-400 hover:text-emerald-400 hover:bg-slate-800/60 transition-colors"
+          >
+            <Download size={16} />
+            Export Data (Excel)
+          </button>
+        </div>
       </nav>
     </>
   )
-}
-
-// --- Placeholder pages: replace each with real content later ---
-function Home() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">Home page — dashboard KPIs go here.</div>
-}
-
-function About() {
-  return <div className="p-4 sm:p-6 lg:p-8 text-slate-300">About — project description goes here.</div>
 }
 
 export default function App() {
