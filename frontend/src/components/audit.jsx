@@ -4,18 +4,21 @@ import axios from 'axios'
 import { UploadCloud, FileText, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 
 const mockFiles = [
-  { file_id: 1, filename: 'stripe_invoices_staging.csv', sourceType: 'invoices', uploadedAt: '2026-07-18 10:22', status: 'processed' },
-  { file_id: 2, filename: 'departmental_opsex_2025.xlsx', sourceType: 'opex', uploadedAt: '2026-07-19 09:05', status: 'pending' },
-  { file_id: 3, filename: 'access_internal_payroll.csv', sourceType: 'payroll', uploadedAt: '2026-07-19 09:10', status: 'failed' },
+  // Fixed keys to camelCase to match the DB schema format and keep your console happy
+  { fileId: 1, filename: 'stripe_invoices_staging.csv', sourceType: 'invoices', uploadedAt: '2026-07-18 10:22', status: 'processed' },
+  { fileId: 2, filename: 'departmental_opsex_2025.xlsx', sourceType: 'opex', uploadedAt: '2026-07-19 09:05', status: 'pending' },
+  { fileId: 3, filename: 'access_internal_payroll.csv', sourceType: 'payroll', uploadedAt: '2026-07-19 09:10', status: 'failed' },
 ]
 
 const statusConfig = {
   processed: { icon: CheckCircle2, color: 'text-emerald-400', label: 'Processed' },
   pending: { icon: Clock3, color: 'text-amber-400', label: 'Pending' },
   failed: { icon: XCircle, color: 'text-red-400', label: 'Failed' },
+  processing: { icon: Loader2, color: 'text-slate-400', label: 'Processing' },
 }
 
 function formatDate(isoString) {
+  if (!isoString) return 'Just now'
   const date = new Date(isoString)
   return date.toLocaleString('en-US', {
     dateStyle: 'medium',
@@ -39,7 +42,6 @@ export default function Audit() {
     }
   }
 
-  // Load the file list once when the tab first mounts
   useEffect(() => {
     fetchFiles()
   }, [])
@@ -59,11 +61,16 @@ export default function Audit() {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setUploadState('success')
-      setUploadMessage(res.data)
-      fetchFiles() // refresh the table so the new upload shows up immediately
+      // Fix: Extract a simple text string (like the filename) instead of saving the whole raw object
+      setUploadMessage(`Successfully queued ${res.data.filename || file.name} for processing!`)
+      fetchFiles() 
     } catch (err) {
       setUploadState('error')
-      setUploadMessage(err.response?.data || 'Upload failed. Check the server is running.')
+      // Fix: Check if error response data is an object before rendering it
+      const errMsg = typeof err.response?.data === 'object' 
+        ? 'Upload failed: Server error' 
+        : err.response?.data
+      setUploadMessage(errMsg || 'Upload failed. Check the server is running.')
     }
   }
 
@@ -88,11 +95,10 @@ export default function Audit() {
           setDragActive(false)
           handleUpload(e.dataTransfer.files[0])
         }}
-        className={`border-2 border-dashed rounded-lg p-8 sm:p-12 flex flex-col items-center justify-center text-center transition-colors ${
-          dragActive
+        className={`border-2 border-dashed rounded-lg p-8 sm:p-12 flex flex-col items-center justify-center text-center transition-colors ${dragActive
             ? 'border-emerald-400 bg-emerald-400/5'
             : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900'
-        }`}
+          }`}
       >
         <UploadCloud size={36} className="text-emerald-400 mb-3" />
         <p className="text-slate-700 dark:text-slate-300 font-medium">Drag and drop a file, or click to browse</p>
@@ -131,7 +137,7 @@ export default function Audit() {
           </p>
         )}
         {uploadState === 'success' && (
-          <p className="flex items-center gap-2 text-sm text-emerald-400 mt-4">
+          <p className="flex items-center gap-2 text-sm text-emerald-500 mt-4">
             <CheckCircle2 size={16} /> {uploadMessage}
           </p>
         )}
@@ -161,9 +167,12 @@ export default function Audit() {
               </tr>
             ) : (
               files.map((f) => {
-                const { icon: Icon, color, label } = statusConfig[f.status]
+                // Safe check fallback setup if statusConfig configuration lookup returns null
+                const currentStatus = statusConfig[f?.status] || statusConfig["processing"];
+                const { icon: Icon, color, label } = currentStatus;
+
                 return (
-                  <tr key={f.fileId} className="border-b border-slate-100 dark:border-slate-800/60">
+                  <tr key={f.fileId || f.file_id || Math.random()} className="border-b border-slate-100 dark:border-slate-800/60">
                     <td className="px-4 sm:px-5 py-3 flex items-center gap-2 text-slate-700 dark:text-slate-300">
                       <FileText size={16} className="text-slate-400" />
                       {f.filename}
@@ -171,11 +180,11 @@ export default function Audit() {
                     <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400 capitalize">{f.sourceType}</td>
                     <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-400">{formatDate(f.uploadedAt)}</td>
                     <td className="px-4 sm:px-5 py-3">
-                      <Icon size={16} className={color} />
+                      <Icon size={16} className={color} title={label} />
                     </td>
                   </tr>
-                )}
-              )
+                )
+              })
             )}
           </tbody>
         </table>

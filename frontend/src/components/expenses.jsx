@@ -1,20 +1,40 @@
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
-const mockOpex = [
-  { expense_date: '2026-07-01', expense_category: 'AWS Cloud Hosting', allocated_budget_usd: 8000, actual_spent_usd: 9200 },
-  { expense_date: '2026-07-02', expense_category: 'Marketing Ads', allocated_budget_usd: 6000, actual_spent_usd: 5100 },
-  { expense_date: '2026-07-03', expense_category: 'Software Licenses', allocated_budget_usd: 3000, actual_spent_usd: 3400 },
-  { expense_date: '2026-07-04', expense_category: 'Office Rent', allocated_budget_usd: 12000, actual_spent_usd: 12000 },
-  { expense_date: '2026-07-05', expense_category: 'Travel Expenses', allocated_budget_usd: 2500, actual_spent_usd: 1800 },
-]
-
-const chartData = mockOpex.map(o => ({
-  category: o.expense_category,
-  Allocated: o.allocated_budget_usd,
-  Actual: o.actual_spent_usd,
-}))
-
 export default function Expenses() {
+  const [opexRows, setOpexRows] = useState([])
+  const [chartData, setChartData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [rowsRes, summaryRes] = await Promise.all([
+          axios.get('http://localhost:8080/api/opex'),
+          axios.get('http://localhost:8080/api/opex/summary'),
+        ])
+
+        setOpexRows(rowsRes.data)
+        setChartData(
+          summaryRes.data.map((row) => ({
+            category: row.category,
+            Allocated: Number(row.allocated),
+            Actual: Number(row.actual),
+          }))
+        )
+      } catch (err) {
+        console.error('Error fetching opex data:', err)
+        setError('Could not load expense data. Check the server is running.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div>
@@ -22,50 +42,58 @@ export default function Expenses() {
         <p className="text-sm text-slate-500 dark:text-slate-400">Departmental operating expense tracker</p>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
-        <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Allocated vs Actual Spend</h3>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-            <XAxis dataKey="category" stroke="#64748b" fontSize={10} />
-            <YAxis stroke="#64748b" fontSize={12} />
-            <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8, color: '#e2e8f0' }} />
-            <Bar dataKey="Allocated" fill="#475569" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Actual" fill="#34d399" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {error && <p className="text-sm text-red-400">{error}</p>}
 
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-              <th className="px-4 sm:px-5 py-3 font-medium">Date</th>
-              <th className="px-4 sm:px-5 py-3 font-medium">Category</th>
-              <th className="px-4 sm:px-5 py-3 font-medium">Allocated</th>
-              <th className="px-4 sm:px-5 py-3 font-medium">Actual</th>
-              <th className="px-4 sm:px-5 py-3 font-medium">Variance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockOpex.map((row, i) => {
-              const variance = row.actual_spent_usd - row.allocated_budget_usd
-              const over = variance > 0
-              return (
-                <tr key={i} className="border-b border-slate-100 dark:border-slate-800/60">
-                  <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-300">{row.expense_date}</td>
-                  <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-300">{row.expense_category}</td>
-                  <td className="px-4 sm:px-5 py-3 font-mono text-slate-900 dark:text-slate-100">${row.allocated_budget_usd}</td>
-                  <td className="px-4 sm:px-5 py-3 font-mono text-slate-900 dark:text-slate-100">${row.actual_spent_usd}</td>
-                  <td className={`px-4 sm:px-5 py-3 font-mono ${over ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {over ? '+' : ''}{variance}
-                  </td>
+      {loading ? (
+        <p className="text-sm text-slate-400 dark:text-slate-500">Loading expense data...</p>
+      ) : (
+        <>
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
+            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Allocated vs Actual Spend</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                <XAxis dataKey="category" stroke="#64748b" fontSize={10} />
+                <YAxis stroke="#64748b" fontSize={12} />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: 8, color: '#e2e8f0' }} />
+                <Bar dataKey="Allocated" fill="#475569" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Actual" fill="#34d399" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto max-h-[500px] overflow-y-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-white dark:bg-slate-900">
+                <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                  <th className="px-4 sm:px-5 py-3 font-medium">Date</th>
+                  <th className="px-4 sm:px-5 py-3 font-medium">Category</th>
+                  <th className="px-4 sm:px-5 py-3 font-medium">Allocated</th>
+                  <th className="px-4 sm:px-5 py-3 font-medium">Actual</th>
+                  <th className="px-4 sm:px-5 py-3 font-medium">Variance</th>
                 </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {opexRows.map((row) => {
+                  const variance = row.actualSpentUsd - row.allocatedBudgetUsd
+                  const over = variance > 0
+                  return (
+                    <tr key={row.id} className="border-b border-slate-100 dark:border-slate-800/60">
+                      <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-300">{row.expenseDate}</td>
+                      <td className="px-4 sm:px-5 py-3 text-slate-600 dark:text-slate-300">{row.expenseCategory}</td>
+                      <td className="px-4 sm:px-5 py-3 font-mono text-slate-900 dark:text-slate-100">${row.allocatedBudgetUsd}</td>
+                      <td className="px-4 sm:px-5 py-3 font-mono text-slate-900 dark:text-slate-100">${row.actualSpentUsd}</td>
+                      <td className={`px-4 sm:px-5 py-3 font-mono ${over ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {over ? '+' : ''}{variance.toFixed(2)}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   )
 }

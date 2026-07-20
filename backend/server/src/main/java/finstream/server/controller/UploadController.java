@@ -2,10 +2,14 @@ package finstream.server.controller;
 
 import finstream.server.model.UploadedFile;
 import finstream.server.repository.UploadedFileRepository;
+import finstream.server.service.EtlService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,46 +19,52 @@ import java.util.List;
 public class UploadController {
 
     private final UploadedFileRepository uploadedFileRepository;
+    private final EtlService etlService;
 
-    public UploadController(UploadedFileRepository uploadedFileRepository) {
+    public UploadController(UploadedFileRepository uploadedFileRepository, EtlService etlService) {
         this.uploadedFileRepository = uploadedFileRepository;
+        this.etlService = etlService;
     }
 
-
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<UploadedFile>> findAll() {
         return ResponseEntity.ok(uploadedFileRepository.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<String> uploadFile(
+    public ResponseEntity<UploadedFile> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("sourceType") String sourceType) {
 
+        // 1. Initial Validation
+        if (!"invoices".equals(sourceType) && !"payroll".equals(sourceType) && !"opex".equals(sourceType)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // 2. Persist the record state immediately to get an ID
         UploadedFile record = new UploadedFile();
         record.setFilename(file.getOriginalFilename());
         record.setSourceType(sourceType);
         record.setUploadedAt(LocalDateTime.now());
         record.setStatus("processing");
-        uploadedFileRepository.save(record); // insert as "processing" first
+        UploadedFile savedRecord = uploadedFileRepository.save(record);
 
         try {
-            String result = switch (sourceType) {
-                case "invoices" -> "Invoices processed: " + file.getOriginalFilename();
-                case "payroll" -> "Payroll processed: " + file.getOriginalFilename();
-                case "opex" -> "Opex processed: " + file.getOriginalFilename();
-                default -> throw new IllegalArgumentException("Unknown source type: " + sourceType);
-            };
+            // 3. Hand off raw bytes or store the file temporarily.
+            // We read the bytes *now* before the request closes.
+            byte[] fileBytes = file.getBytes();
 
-            record.setStatus("processed");
-            uploadedFileRepository.save(record); // same object, now has an ID → this becomes an UPDATE
+            // 4. Delegate to the Async Service
+            etlService.processEtlAsync(savedRecord.getFileId(), fileBytes, savedRecord.getFilename(), sourceType);
 
-            return ResponseEntity.ok(result);
+            // 5. Instantly respond to the user with 202 (Accepted) and the processing metadata
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(savedRecord);
 
-        } catch (Exception e) {
-            record.setStatus("failed");
-            uploadedFileRepository.save(record); // UPDATE again, marks it failed
-            return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
+        } catch (IOException e) {
+            savedRecord.setStatus("failed");
+            uploadedFileRepository.save(savedRecord);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

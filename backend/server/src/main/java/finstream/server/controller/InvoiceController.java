@@ -4,7 +4,10 @@ import finstream.server.model.Invoice;
 import finstream.server.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -28,6 +31,16 @@ public class InvoiceController {
     @GetMapping("/status/{status}")
     public List<Invoice> getByStatus(@PathVariable String status) {
         return invoiceService.getInvoicesByStatus(status);
+    }
+
+    @GetMapping("/mrr-by-tier")
+    public Map<String, Map<String, BigDecimal>> getMrrByTier() {
+        return invoiceService.getMrrByTierAndMonth();
+    }
+
+    @GetMapping("/revenue-trend")
+    public Map<String, java.math.BigDecimal> getRevenueTrend() {
+        return invoiceService.getRevenueTrendByMonth();
     }
 
     // POST http://localhost:8080/api/invoices  (body: JSON invoice object)

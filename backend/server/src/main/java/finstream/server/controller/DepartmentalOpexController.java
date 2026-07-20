@@ -4,6 +4,7 @@ import finstream.server.model.DepartmentalOpex;
 import finstream.server.service.DepartmentalOpexService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/opex")
@@ -19,5 +20,10 @@ public class DepartmentalOpexController {
     @GetMapping
     public List<DepartmentalOpex> getAll() {
         return opexService.getAll();
+    }
+
+    @GetMapping("/summary")
+    public List<Map<String, Object>> getSummary() {
+        return opexService.getSummaryByCategory();
     }
 }
