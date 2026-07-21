@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payroll")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "https://finstream-app.vercel.app/"})
 public class PayrollController {
 
     private final PayrollService payrollService;

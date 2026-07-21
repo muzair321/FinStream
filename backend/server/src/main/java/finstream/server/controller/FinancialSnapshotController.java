@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/metrics")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "https://finstream-app.vercel.app/"})
 public class FinancialSnapshotController {
 
     private final FinancialSnapshotService snapshotService;

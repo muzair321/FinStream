@@ -2,10 +2,12 @@ package finstream.server.service;
 
 import finstream.server.model.UploadedFile;
 import finstream.server.repository.UploadedFileRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +17,12 @@ import java.nio.file.StandardOpenOption;
 public class EtlService {
 
     private final UploadedFileRepository uploadedFileRepository;
+
+    @Value("${etl.python.executable}")
+    private String pythonExecutable;
+
+    @Value("${etl.script.path}")
+    private String etlScriptPath;
 
     public EtlService(UploadedFileRepository uploadedFileRepository) {
         this.uploadedFileRepository = uploadedFileRepository;
@@ -26,17 +34,14 @@ public class EtlService {
         Path tempFile = null;
 
         try {
-            // 1. Create a unique temporary file on the OS storage layer to pass to Python
             String extension = filename.endsWith(".xlsx") ? ".xlsx" : ".csv";
             tempFile = Files.createTempFile("finstream_", extension);
             Files.write(tempFile, fileBytes, StandardOpenOption.WRITE);
 
             System.out.println("[ETL] Saved temporary upload file to: " + tempFile.toAbsolutePath());
 
-            // 2. Fix: Pass the absolute path string and source type to the execution engine
             runEtlPipeline(tempFile.toAbsolutePath().toString(), sourceType);
 
-            // 3. Complete Lifecycle Update
             record.setStatus("processed");
             uploadedFileRepository.save(record);
             System.out.println("[ETL Success] Finished processing " + filename);
@@ -46,7 +51,6 @@ public class EtlService {
             uploadedFileRepository.save(record);
             System.err.println("[ETL Failure] Processing failed for " + filename + ": " + e.getMessage());
         } finally {
-            // 4. Housekeeping: Delete the temporary file from the disk so you don't accumulate junk files
             if (tempFile != null) {
                 try {
                     Files.deleteIfExists(tempFile);
@@ -59,13 +63,14 @@ public class EtlService {
 
     private void runEtlPipeline(String savedFilePath, String sourceType) throws Exception {
         ProcessBuilder pb = new ProcessBuilder(
-                "C:/Users/muzai/AppData/Local/Programs/Python/Python314/python.exe",
-                "C:/Users/muzai/OneDrive/Documents/Study/FinStream/FinStream/etl-python/etl_pipeline.py",
-                savedFilePath,  // sys.argv[1] in Python script
-                sourceType      // sys.argv[2] in Python script
+                pythonExecutable,
+                etlScriptPath,
+                savedFilePath,
+                sourceType
         );
 
-        // Ensure python utilizes UTF-8 to prevent any emoji/unicode terminal crash warnings
+        pb.directory(new File(etlScriptPath).getParentFile());
+
         pb.environment().put("PYTHONIOENCODING", "UTF-8");
         pb.redirectErrorStream(true);
         Process process = pb.start();

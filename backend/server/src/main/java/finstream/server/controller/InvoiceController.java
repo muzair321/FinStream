@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/invoices")
-@CrossOrigin(origins = "http://localhost:5173") // your Vite dev server
+@CrossOrigin(origins = {"http://localhost:5173", "https://finstream-app.vercel.app/"}) // your Vite dev server
 public class InvoiceController {
 
     private final InvoiceService invoiceService;

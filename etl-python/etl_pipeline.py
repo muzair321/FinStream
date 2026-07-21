@@ -17,24 +17,22 @@ from dotenv import load_dotenv
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import insert
 
-# ---------------------------------------------------------------------------
-# 0. SETUP — load DB connection string from .env, never hardcode it
-# ---------------------------------------------------------------------------
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+load_dotenv(dotenv_path=os.path.join(BASE_DIR, ".env"))
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
+
+print(f"DEBUG - Raw DATABASE_URL: {repr(DATABASE_URL)}")
 
 if not DATABASE_URL:
     raise RuntimeError(
-        "DATABASE_URL is not set. Create a .env file next to this script with:\n"
-        "DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require"
+        f"DATABASE_URL is not set. Expected a .env file at: {os.path.join(BASE_DIR, '.env')}"
     )
 
 engine = create_engine(DATABASE_URL)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-EXCHANGE_RATE_PKR_TO_USD = 278  # static rate; swap for a live FX API call later if you want
-
+EXCHANGE_RATE_PKR_TO_USD = 278
 
 # ---------------------------------------------------------------------------
 # 1. EXTRACT + TRANSFORM — one function per source type
@@ -314,3 +312,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"CRITICAL PIPELINE ERROR: {str(e)}", file=sys.stderr)
         sys.exit(1) # Exits with error code 1 so Spring Boot detects the failure cleanly
+

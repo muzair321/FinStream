@@ -1,0 +1,12 @@
+etl-python/.env
+etl-python/*.db
+etl-python/__pycache__
+etl-python/venv
+backend/server/target/*.jar.original
+frontend/node_modules
+frontend/dist
+.git
+.idea
+n8n-worflows
+visual
+mockData.txt

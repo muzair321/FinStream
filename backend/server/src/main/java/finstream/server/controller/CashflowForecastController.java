@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/forecast")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins ={"http://localhost:5173", "https://finstream-app.vercel.app/"})
 public class CashflowForecastController {
 
     private final CashflowForecastRepository forecastRepository;
