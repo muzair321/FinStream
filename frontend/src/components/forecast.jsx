@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Clock } from 'lucide-react'
+import { API_URL } from '../config'
 
 export default function Forecast({ theme }) {
   const isDark = theme === 'dark'
@@ -14,13 +15,14 @@ export default function Forecast({ theme }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [revenueRes, forecastRes, snapshotRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/invoices/revenue-trend'),
-          axios.get('http://localhost:8080/api/forecast'),
-          axios.get('http://localhost:8080/api/metrics/latest'),
+          axios.get('${API_URL}/api/invoices/revenue-trend'),
+          axios.get('${API_URL}/api/forecast'),
+          axios.get('${API_URL}/api/metrics/latest'),
         ])
 
         const actualPoints = Object.entries(revenueRes.data).map(([month, revenue]) => ({

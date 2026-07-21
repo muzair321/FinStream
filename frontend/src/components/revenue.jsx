@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { API_URL } from '../config'
 
 const statusStyles = {
   Paid: 'bg-emerald-400/10 text-emerald-400',
@@ -20,8 +21,8 @@ export default function Revenue() {
     const fetchData = async () => {
       try {
         const [invoicesRes, mrrRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/invoices'),
-          axios.get('http://localhost:8080/api/invoices/mrr-by-tier'),
+          axios.get('${API_URL}/api/invoices'),
+          axios.get('${API_URL}/api/invoices/mrr-by-tier'),
         ])
 
         setInvoices(invoicesRes.data)

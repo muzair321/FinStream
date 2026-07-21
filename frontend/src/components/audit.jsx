@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Clock3 } from 'lucide-react'
 import axios from 'axios'
 import { UploadCloud, FileText, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { API_URL } from '../config'
 
 const mockFiles = [
   // Fixed keys to camelCase to match the DB schema format and keep your console happy
@@ -35,7 +36,7 @@ export default function Audit() {
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/upload')
+      const res = await axios.get('${API_URL}/api/upload')
       setFiles(res.data)
     } catch (err) {
       console.error('Error fetching uploaded files:', err)
@@ -57,7 +58,7 @@ export default function Audit() {
     formData.append('sourceType', sourceType)
 
     try {
-      const res = await axios.post('http://localhost:8080/api/upload', formData, {
+      const res = await axios.post('${API_URL}/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setUploadState('success')

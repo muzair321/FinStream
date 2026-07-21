@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { API_URL } from '../config'
 
 export default function Payroll() {
   const [deptCosts, setDeptCosts] = useState([])
@@ -10,7 +11,7 @@ export default function Payroll() {
   useEffect(() => {
     const fetchPayroll = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/payroll/by-department')
+        const res = await axios.get('${API_URL}/api/payroll/by-department')
         // Transform { "Engineering": 62400, ... } into [{ department: 'Engineering', totalCostUsd: 62400 }, ...]
         const transformed = Object.entries(res.data).map(([department, totalCostUsd]) => ({
           department,

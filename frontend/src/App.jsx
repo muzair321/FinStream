@@ -10,6 +10,7 @@ import Audit from './components/audit.jsx'
 import About from './components/about.jsx'
 import { Download } from 'lucide-react'
 import axios from 'axios'
+import { API_URL } from '../config'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
@@ -28,7 +29,7 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   }
   const handleExport = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/export/excel', {
+      const res = await axios.get('${API_URL}/api/export/excel', {
         responseType: 'blob', // tells axios to expect binary data, not JSON
       })
 

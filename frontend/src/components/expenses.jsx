@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { API_URL } from '../config'
 
 export default function Expenses() {
   const [opexRows, setOpexRows] = useState([])
@@ -12,8 +13,8 @@ export default function Expenses() {
     const fetchData = async () => {
       try {
         const [rowsRes, summaryRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/opex'),
-          axios.get('http://localhost:8080/api/opex/summary'),
+          axios.get('${API_URL}/api/opex'),
+          axios.get('${API_URL}/api/opex/summary'),
         ])
 
         setOpexRows(rowsRes.data)

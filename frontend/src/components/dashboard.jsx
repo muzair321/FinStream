@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { TrendingUp, Flame, Clock, Target } from 'lucide-react'
-
+import { API_URL } from '../config'
 
 
 
@@ -45,9 +45,9 @@ export default function Dashboard({ theme }) {
     const fetchAll = async () => {
       try {
         const [dashboardRes, revenueRes, opexRes] = await Promise.all([
-          axios.get('http://localhost:8080/api/metrics/latest-with-change'),
-          axios.get('http://localhost:8080/api/invoices/revenue-trend'),
-          axios.get('http://localhost:8080/api/opex/summary'),
+          axios.get('${API_URL}/api/metrics/latest-with-change'),
+          axios.get('${API_URL}/api/invoices/revenue-trend'),
+          axios.get('${API_URL}/api/opex/summary'),
         ])
 
         setDashboardData(dashboardRes.data)
