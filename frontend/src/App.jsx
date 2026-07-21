@@ -10,7 +10,7 @@ import Audit from './components/audit.jsx'
 import About from './components/about.jsx'
 import { Download } from 'lucide-react'
 import axios from 'axios'
-import { API_URL } from '../config'
+import { API_URL } from './config.js'
 
 function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const tabs = [
