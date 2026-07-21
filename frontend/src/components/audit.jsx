@@ -58,7 +58,7 @@ export default function Audit() {
     formData.append('sourceType', sourceType)
 
     try {
-      const res = await axios.post('${API_URL}/api/upload', formData, {
+      const res = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setUploadState('success')
