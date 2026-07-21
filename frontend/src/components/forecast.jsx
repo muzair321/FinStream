@@ -20,9 +20,9 @@ export default function Forecast({ theme }) {
     const fetchData = async () => {
       try {
         const [revenueRes, forecastRes, snapshotRes] = await Promise.all([
-          axios.get('${API_URL}/api/invoices/revenue-trend'),
-          axios.get('${API_URL}/api/forecast'),
-          axios.get('${API_URL}/api/metrics/latest'),
+          axios.get(`${API_URL}/api/invoices/revenue-trend`),
+          axios.get(`${API_URL}/api/forecast`),
+          axios.get(`${API_URL}/api/metrics/latest`),
         ])
 
         const actualPoints = Object.entries(revenueRes.data).map(([month, revenue]) => ({

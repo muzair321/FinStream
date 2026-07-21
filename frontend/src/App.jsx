@@ -29,7 +29,7 @@ function TabContainer({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   }
   const handleExport = async () => {
     try {
-      const res = await axios.get('${API_URL}/api/export/excel', {
+      const res = await axios.get(`${API_URL}/api/export/excel`, {
         responseType: 'blob', // tells axios to expect binary data, not JSON
       })
 

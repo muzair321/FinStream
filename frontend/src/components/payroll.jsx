@@ -11,7 +11,7 @@ export default function Payroll() {
   useEffect(() => {
     const fetchPayroll = async () => {
       try {
-        const res = await axios.get('${API_URL}/api/payroll/by-department')
+        const res = await axios.get(`${API_URL}/api/payroll/by-department`)
         // Transform { "Engineering": 62400, ... } into [{ department: 'Engineering', totalCostUsd: 62400 }, ...]
         const transformed = Object.entries(res.data).map(([department, totalCostUsd]) => ({
           department,

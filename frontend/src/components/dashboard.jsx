@@ -45,9 +45,9 @@ export default function Dashboard({ theme }) {
     const fetchAll = async () => {
       try {
         const [dashboardRes, revenueRes, opexRes] = await Promise.all([
-          axios.get('${API_URL}/api/metrics/latest-with-change'),
-          axios.get('${API_URL}/api/invoices/revenue-trend'),
-          axios.get('${API_URL}/api/opex/summary'),
+          axios.get(`${API_URL}/api/metrics/latest-with-change`),
+          axios.get(`${API_URL}/api/invoices/revenue-trend`),
+          axios.get(`${API_URL}/api/opex/summary`),
         ])
 
         setDashboardData(dashboardRes.data)

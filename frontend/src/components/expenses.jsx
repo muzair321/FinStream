@@ -13,8 +13,8 @@ export default function Expenses() {
     const fetchData = async () => {
       try {
         const [rowsRes, summaryRes] = await Promise.all([
-          axios.get('${API_URL}/api/opex'),
-          axios.get('${API_URL}/api/opex/summary'),
+          axios.get(`${API_URL}/api/opex`),
+          axios.get(`${API_URL}/api/opex/summary`),
         ])
 
         setOpexRows(rowsRes.data)
