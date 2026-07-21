@@ -45,6 +45,7 @@ const credits = [
       'PostgreSQL schema design and Neon migration',
       'React dashboard — all six tabs, charts, and upload flow',
       'File upload pipeline with source-type validation and status tracking',
+      'Docker-based deployment and containerization',
     ],
   },
 ]
@@ -55,7 +56,7 @@ const techStack = [
   { name: 'PostgreSQL (Neon)', icon: Database, status: 'live' },
   { name: 'Python (pandas)', icon: Code2, status: 'live' },
   { name: 'n8n Automation', icon: GitBranch, status: 'planned' },
-  { name: 'Docker + Deployment', icon: Layers, status: 'planned' },
+  { name: 'Docker + Deployment', icon: Layers, status: 'live' },
 ]
 
 export default function About() {
@@ -146,8 +147,8 @@ export default function About() {
             })}
           </div>
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-4">
-            n8n workflow automation and Docker-based deployment are part of the original design but not yet
-            implemented — the pipeline currently runs on demand rather than on a schedule.
+            n8n workflow automation is part of the original design but not yet
+            implemented it is scraped — the pipeline currently runs on demand rather than on a schedule.
           </p>
         </div>
 
