@@ -17,7 +17,7 @@ import java.time.Duration;
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final Bucket bucket = Bucket.builder()
-            .addLimit(Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1))))
+            .addLimit(Bandwidth.classic(10, Refill.greedy(10, Duration.ofMinutes(1))))
             .build();
 
     @Override
